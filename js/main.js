@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import {GlowFilter} from '@pixi/filter-glow';
+import {CRTFilter} from '@pixi/filter-crt';
 import * as SPECTRUM from './spectrum.js';
 import * as MENU from './menu.js';
 
@@ -62,6 +63,10 @@ function init() {
         autoDensity: true,
     });
     document.getElementById('app').appendChild(app.view);
+    app.stage.addChild(new PIXI.Graphics()
+            .beginFill(0xF8F8FF)
+            .drawRect(0, 0, app.screen.width, app.screen.height)
+            .endFill());
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // create FPSCounter
@@ -101,6 +106,7 @@ function init() {
     app.stage.addChild(menu.buttonContainer);
     // app.stage.addChild(menu.contentContainer);
 
+    app.stage.filters = [new CRTFilter()];
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // finalize
     app.ticker.add(animate);
