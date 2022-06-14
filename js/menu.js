@@ -103,7 +103,7 @@ class MenuButton {
         this.container.on('pointertap', this.onPointerTap);
 
         this.rect = new PIXI.Graphics()
-            .beginFill(0xAAAAAA)
+            .beginFill(0x888888)
             .drawRoundedRect(this.x, this.y, this.width, this.height, this.height*0.125)
             .endFill();
         this.container.addChild(this.rect);
@@ -148,7 +148,7 @@ class MenuButton {
         this.time = EASE_TIME;
         this.width = 0;
         this.rect.clear();
-        this.rect.beginFill(0xAAAAAA)
+        this.rect.beginFill(0x888888)
                  .drawRoundedRect(this.x, this.y, this.width, this.height, this.height*0.125)
                  .endFill();
     }
@@ -164,7 +164,7 @@ class MenuButton {
             this.width = (1 - easeOutExpo(this.time / EASE_TIME)) * this.maxWidth;
         }
         this.rect.clear();
-        this.rect.beginFill(0xAAAAAA)
+        this.rect.beginFill(0x888888)
                  .drawRoundedRect(this.x, this.y, this.width, this.height, this.height*0.125)
                  .endFill();
     }
