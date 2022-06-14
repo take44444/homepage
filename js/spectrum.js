@@ -29,7 +29,7 @@ export class NcsSpectrum extends Spectrum {
         this.dx = this.formSize / this.div[0];
         this.dy = this.formSize / this.div[1];
         this.displacement = (op.displacement ? op.displacement : 40.0) * this.quality;
-        let size = (op.size ? op.size : 2.3) * this.quality;
+        let size = (op.size ? op.size : 2.5) * this.quality;
         let color = op.color !== undefined ? op.color : 0xFFFF00;
         this.noiseOptions = op.noiseOptions ? op.noiseOptions
             : {

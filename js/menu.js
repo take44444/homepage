@@ -46,7 +46,7 @@ export class Menu {
             { 
                 fontFamily: 'Noto Sans Mono',
                 fontSize: this.itemHeight*0.8,
-                fill : 0x2B2620
+                fill : 0x0A0A0A
             }
         );
         this.pointer.x = this.x1 - this.itemHeight*0.8;
@@ -112,7 +112,7 @@ class MenuButton {
             { 
                 fontFamily: 'Noto Sans Mono',
                 fontSize: this.height*0.8,
-                fill : 0x2B2620
+                fill : 0x0A0A0A
             }
         );
         titleText.x = x+this.maxWidth*0.05;
@@ -144,6 +144,9 @@ class MenuButton {
 
     unselect() {
         this.selected = false;
+        this.isOver = false;
+        this.time = EASE_TIME;
+        this.width = 0;
         this.rect.clear();
         this.rect.beginFill(0xAAAAAA)
                  .drawRoundedRect(this.x, this.y, this.width, this.height, this.height*0.125)
