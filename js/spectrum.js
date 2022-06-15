@@ -23,8 +23,8 @@ export class NcsSpectrum extends Spectrum {
         super();
         this.container = new PIXI.Container();
         this.quality = op.quality ? op.quality : 1.0;
-        this.formSize = (op.formSize ? op.formSize : 260) * this.quality;
-        this.r = (op.r ? op.r : 322) * this.quality;
+        this.formSize = (op.formSize ? op.formSize : 250) * this.quality;
+        this.r = (op.r ? op.r : 310) * this.quality;
         this.div = op.div ? op.div : [150, 150];
         this.dx = this.formSize / this.div[0];
         this.dy = this.formSize / this.div[1];

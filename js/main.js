@@ -7,7 +7,7 @@ import * as MENU from './menu.js';
 
 let app;
 let quality;
-let fpsCounter;
+let fps;
 let spectrum;
 let menu;
 
@@ -17,13 +17,13 @@ WebFont.load({
     inactive: () => alert('font loading failed')
 });
 
-var FPSCounter = function () {
+var Fps = function () {
     this.cnt = 0;
     this.last = null;
     this.value = "";
 };
 
-FPSCounter.prototype.nextFrame = function () {
+Fps.prototype.nextFrame = function () {
     let now = new Date();
     this.cnt++;
     if (this.last === null) {
@@ -43,16 +43,13 @@ function animate(delta) {
     time += app.ticker.deltaMS/1000;
     spectrum.update([], time);
     menu.update(app.ticker.deltaMS/1000);
-    // rect.beginFill(0x000000)
-    //     .drawRect(0, 0, time*100, 10)
-    //     .endFill();
-    fpsCounter.nextFrame();
-    document.getElementById('fps').innerText = "fps: " + fpsCounter.value;
+    fps.nextFrame();
+    document.getElementById('fps').innerText = "fps: " + fps.value;
     if ((time - Math.floor(time)) > 0.975)
         app.stage.filters = [
             new CRTFilter({ curvature: 1.2, vignetting: 0.27 }),
             new GlitchFilter(
-                { slices: 80, offset: Math.sin(time)*20*quality, seed: time }
+                { slices: 80, offset: Math.sin(time)*30*quality, seed: time }
             )
         ];
     else
@@ -61,13 +58,13 @@ function animate(delta) {
 
 function init() {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // create FPSCounter
-    fpsCounter = new FPSCounter();
+    // create Fps
+    fps = new Fps();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // initialize
     time = 0;
-    quality = 0.7;
+    quality = 0.85;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // create Application
@@ -88,13 +85,13 @@ function init() {
     let name = new PIXI.Text('Takeshi Masumoto',
         { 
             fontFamily: 'Noto Sans Mono',
-            fontSize: 60*quality,
+            fontSize: 50*quality,
             fill : 0x0A0A0A
         }
     );
-    name.x = 70*quality;
-    name.y = 940*quality;
-    name.filters = [new GlowFilter({ distance: 30 * quality, outerStrength: 1.2, color: 0x0A0A0A })];
+    name.x = 90*quality;
+    name.y = 960*quality;
+    name.filters = [new GlowFilter({ distance: 30*quality, outerStrength: 1.2, color: 0x0A0A0A })];
     app.stage.addChild(name);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,7 +107,7 @@ function init() {
     theme.anchor.y = 0.5;
     theme.x = app.screen.width/2;
     theme.y = app.screen.height/2;
-    theme.filters = [new GlowFilter({ distance: 30 * quality, outerStrength: 1.2, color: 0x00BBFF })];
+    theme.filters = [new GlowFilter({ distance: 30*quality, outerStrength: 1.2, color: 0x00BBFF })];
     app.stage.addChild(theme);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,19 +118,18 @@ function init() {
     let spectrumContainer = spectrum.container;
     spectrumContainer.x = app.screen.width/2;
     spectrumContainer.y = app.screen.height/2;
-    spectrumContainer.filters = [new GlowFilter({ distance: 30 * quality, outerStrength: 1.5, color: 0x0A0A0A })];
+    spectrumContainer.filters = [new GlowFilter({ distance: 30*quality, outerStrength: 1.5, color: 0x0A0A0A })];
     app.stage.addChild(spectrumContainer);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // create Menu
-    menu = new MENU.Menu(120, 450, 1800, 400, [
+    menu = new MENU.Menu(120, 450, 1405, 220, [
         { title: 'SNS', contents: [] },
         { title: 'History', contents: [] },
         { title: 'Qualification', contents: [] },
     ], { quality: quality });
-    menu.buttonContainer.filters = [new GlowFilter({ distance: 30 * quality, outerStrength: 1.5, color: 0xBBBBBB })];
-    app.stage.addChild(menu.buttonContainer);
-    // app.stage.addChild(menu.contentContainer);
+    menu.container.filters = [new GlowFilter({ distance: 30*quality, outerStrength: 1.5, color: 0x555555 })];
+    app.stage.addChild(menu.container);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // finalize

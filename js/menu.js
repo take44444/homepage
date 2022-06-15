@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import * as VIEWER from './json-viewer';
 
 const EASE_TIME = 2;
 
@@ -15,7 +16,7 @@ function easeInExpo(x) {
 }
 
 export class Menu {
-    // menuList = [{title: string, content: [string, ...]}, ...]
+    // menuList = [{title: string, content: [object, ...]}, ...]
     constructor(x1, y1, x2, y2, menuList, op) {
         let quality = op.quality ? op.quality : 1.0;
         let width = (op.width ? op.width : 350) * quality;
@@ -29,19 +30,23 @@ export class Menu {
 
         this.buttons = new Array(menuList.length);
         // this.contents = new Array(menuList.length);
-        this.buttonContainer = new PIXI.Container();
-        // this.contentContainer = new PIXI.Container();
+        this.container = new PIXI.Container();
         for (let i=0; i<menuList.length; i++) {
             this.buttons[i] = new MenuButton(
                 this.x1, this.y1 + (this.interval + this.itemHeight) * i, width, this.itemHeight,
                 menuList[i].title, () => this.point(i), () => this.select(i)
             );
-            this.buttonContainer.addChild(this.buttons[i].container);
+            this.container.addChild(this.buttons[i].container);
             // this.contents[i] = new MenuContents(
             //     x2, y2, menuList[i].contents
             // );
             // this.contentContainer.addChild(this.contents[i].container);
         }
+        this.container.addChild(
+            VIEWER.jsonViewer(
+                x2, y2, 460*quality, 700*quality, 21*quality, 'SNS', {}
+            )
+        );
         this.pointer = new PIXI.Text('>',
             { 
                 fontFamily: 'Noto Sans Mono',
@@ -51,7 +56,7 @@ export class Menu {
         );
         this.pointer.x = this.x1 - this.itemHeight*0.8;
         this.pointer.y = this.y1 + this.itemHeight*0.1;
-        this.buttonContainer.addChild(this.pointer);
+        this.container.addChild(this.pointer);
         this.point(0);
         this.selected = 0;
         this.select(0);
