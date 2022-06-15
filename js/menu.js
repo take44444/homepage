@@ -44,7 +44,7 @@ export class Menu {
         }
         this.container.addChild(
             VIEWER.jsonViewer(
-                x2, y2, 460*quality, 700*quality, 21*quality, 'SNS', {}
+                x2, y2, 1920*quality-x2, 1080*quality, 21*quality, 'SNS', {}
             )
         );
         this.pointer = new PIXI.Text('>',

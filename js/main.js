@@ -123,7 +123,7 @@ function init() {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // create Menu
-    menu = new MENU.Menu(120, 450, 1405, 220, [
+    menu = new MENU.Menu(120, 450, 1460, 0, [
         { title: 'SNS', contents: [] },
         { title: 'History', contents: [] },
         { title: 'Qualification', contents: [] },
