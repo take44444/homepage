@@ -2,14 +2,16 @@ import * as PIXI from 'pixi.js';
 import {GlowFilter} from '@pixi/filter-glow';
 import {CRTFilter} from '@pixi/filter-crt';
 import {GlitchFilter} from '@pixi/filter-glitch';
+import * as TEXT from './text.js'
 import * as SPECTRUM from './spectrum.js';
 import * as MENU from './menu.js';
+import * as STATUS from './statusline.js';
 
 let app;
 let quality;
-let fps;
 let spectrum;
 let menu;
+let statusline;
 
 WebFont.load({
     google: { families: ['Noto Sans Mono'] },
@@ -17,25 +19,7 @@ WebFont.load({
     inactive: () => alert('font loading failed')
 });
 
-var Fps = function () {
-    this.cnt = 0;
-    this.last = null;
-    this.value = "";
-};
 
-Fps.prototype.nextFrame = function () {
-    let now = new Date();
-    this.cnt++;
-    if (this.last === null) {
-        this.last = now;
-        return;
-    }
-    if ((now - this.last) > 200) {
-        this.value = (((200 * this.cnt) / (now - this.last)) * 5).toFixed(1);
-        this.cnt = 0;
-        this.last = now;
-    }
-};
 
 let time;
 function animate(delta) {
@@ -43,8 +27,7 @@ function animate(delta) {
     time += app.ticker.deltaMS/1000;
     spectrum.update([], time);
     menu.update(app.ticker.deltaMS/1000);
-    fps.nextFrame();
-    document.getElementById('fps').innerText = "fps: " + fps.value;
+    statusline.update();
     if ((time - Math.floor(time)) > 0.975)
         app.stage.filters = [
             new CRTFilter({ curvature: 1.2, vignetting: 0.27 }),
@@ -58,19 +41,15 @@ function animate(delta) {
 
 function init() {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // create Fps
-    fps = new Fps();
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // initialize
     time = 0;
-    quality = 0.85;
+    quality = 1.0;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // create Application
     app = new PIXI.Application({
         width: 1920*quality,
-        height: 1080*quality,
+        height: 840*quality,
         backgroundColor: 0x000000,
         autoDensity: true,
     });
@@ -82,54 +61,124 @@ function init() {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // create name
-    let name = new PIXI.Text('Takeshi Masumoto',
-        { 
-            fontFamily: 'Noto Sans Mono',
-            fontSize: 50*quality,
-            fill : 0x0A0A0A
-        }
+    let name = TEXT.Text(100*quality, 50*quality, 35*quality,
+        'Takeshi Masumoto', 0x0A0A0A
     );
-    name.x = 90*quality;
-    name.y = 960*quality;
-    name.filters = [new GlowFilter({ distance: 30*quality, outerStrength: 1.2, color: 0x0A0A0A })];
+    name.filters = [
+        new GlowFilter(
+            { distance: 30*quality, outerStrength: 1.2, color: 0x0A0A0A }
+        )
+    ];
     app.stage.addChild(name);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // create theme
-    let theme = new PIXI.Text('Creativity',
-        { 
-            fontFamily: 'Noto Sans Mono',
-            fontSize: 50*quality,
-            fill : 0x0077FF
-        }
-    );
+    let theme = TEXT.Text(0, 0, 35*quality, 'Creativity', 0x0077FF);
     theme.anchor.x = 0.5;
     theme.anchor.y = 0.5;
-    theme.x = app.screen.width/2;
-    theme.y = app.screen.height/2;
-    theme.filters = [new GlowFilter({ distance: 30*quality, outerStrength: 1.2, color: 0x00BBFF })];
+    theme.x = 420*quality;
+    theme.y = 450*quality;
+    theme.filters = [
+        new GlowFilter(
+            { distance: 30*quality, outerStrength: 1.2, color: 0x0077FF }
+        )
+    ];
     app.stage.addChild(theme);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // create NcsSpectrum
     spectrum = new SPECTRUM.NcsSpectrum(
-        { quality: quality, color: 0x0A0A0A, div: [127, 127] }
+        { quality: quality, color: 0x0A0A0A, div: [120, 120] }
     );
     let spectrumContainer = spectrum.container;
-    spectrumContainer.x = app.screen.width/2;
-    spectrumContainer.y = app.screen.height/2;
-    spectrumContainer.filters = [new GlowFilter({ distance: 30*quality, outerStrength: 1.5, color: 0x0A0A0A })];
+    spectrumContainer.x = 420*quality;
+    spectrumContainer.y = 450*quality;
+    spectrumContainer.filters = [new GlowFilter({ distance: 30*quality, outerStrength: 1.5, color: 0x000000 })];
     app.stage.addChild(spectrumContainer);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // create Menu
-    menu = new MENU.Menu(120, 450, 1460, 0, [
-        { title: 'SNS', contents: [] },
-        { title: 'History', contents: [] },
-        { title: 'Qualification', contents: [] },
-    ], { quality: quality });
-    menu.container.filters = [new GlowFilter({ distance: 30*quality, outerStrength: 1.5, color: 0x555555 })];
-    app.stage.addChild(menu.container);
+    menu = new MENU.Menu(
+        800*quality, 200*quality, 350*quality, 170*quality, 35*quality,
+        1190*quality, 52*quality, 23*quality, 32,
+        [
+            {
+                title: "SNS",
+                data: [
+                    {
+                        name: "Twitter",
+                        url: "twitter.com/__take4"
+                    },
+                    {
+                        name: "YouTube",
+                        url: "youtube.com/channel/UCCpMrpmLGhb1PO-aPhzlmGw"
+                    }
+                ]
+            },
+            {
+                title: "Interests",
+                data: [
+                    {
+                        name: "Cyber Security",
+                        description: "Reversing, Pwn"
+                    },
+                    {
+                        name: "Programming Language",
+                        description: "C/C++, Python, Rust, Java(Type)Script"
+                    },
+                    {
+                        name: "Algorithm and Data Structure",
+                        description: "Graph theory, Search algorithms"
+                    },
+                    {
+                        name: "Web Development",
+                        description: "PixiJS, React, Shader, Web Assembly"
+                    },
+                    {
+                        name: "Computer Graphics",
+                        description: "Perlin Noise, Curl Noise"
+                    }
+                ]
+            },
+            {
+                title: "Other",
+                data: [
+                    {
+                        title: "Works",
+                        data: [
+                            {
+                                name: "Audio Spectrum Script",
+                                url: "youtube.com/watch?v=j9wNzf7jiH8"
+                            },
+                            {
+                                name: "Algorithm Book",
+                                url: "take44444.github.io/Algorithm-Book/"
+                            }
+                        ]
+                    },
+                    {
+                        title: "Qualifications",
+                        data: [
+                            {
+                                name: "AtCoder",
+                                description: "Cyan Coder"
+                            },
+                            {
+                                name: "Security Next Camp",
+                                description: "Security Next Camp 2020"
+                            }
+                        ]
+                    }
+                ]
+            },
+        ]
+    );
+    menu.buttonContainer.filters = [new GlowFilter({ distance: 30*quality, outerStrength: 1.5, color: 0x555555 })];
+    app.stage.addChild(menu.buttonContainer);
+    app.stage.addChild(menu.contentContainer);
+
+    statusline = new STATUS.StatusLine(0, 820*quality, 1920*quality, 20*quality);
+    app.stage.addChild(statusline.container);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // finalize
