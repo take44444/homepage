@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
-import * as JSON_TEXT from './json-text';
+import * as JSON_TEXT from './json-text.js';
+import * as TEXT from './text.js'
 
 const EASE_TIME = 2;
 
@@ -39,15 +40,10 @@ export class Menu {
                 this.contents[i].addChild(JSON_TEXT.lineNumText(x2, y2, l, lineHeight));
             }
         }
-        this.pointer = new PIXI.Text('>',
-            { 
-                fontFamily: 'Noto Sans Mono',
-                fontSize: this.itemHeight*0.8,
-                fill : 0x0A0A0A
-            }
+        this.pointer = TEXT.Text(
+            this.x1-this.itemHeight*0.8, this.y1+this.itemHeight*0.1,
+            this.itemHeight*0.8, '>', 0x0A0A0A
         );
-        this.pointer.x = this.x1 - this.itemHeight*0.8;
-        this.pointer.y = this.y1 + this.itemHeight*0.1;
         this.buttonContainer.addChild(this.pointer);
         this.point(0);
         this.selected = 0;
@@ -105,16 +101,10 @@ class MenuButton {
             .endFill();
         this.container.addChild(this.rect);
 
-        let titleText = new PIXI.Text(title,
-            { 
-                fontFamily: 'Noto Sans Mono',
-                fontSize: this.height*0.8,
-                fill : 0x0A0A0A
-            }
-        );
-        titleText.x = x+this.maxWidth*0.05;
-        titleText.y = y+this.height*0.1;
-        this.container.addChild(titleText);
+        this.container.addChild(TEXT.Text(
+            x+this.maxWidth*0.05, y+this.height*0.1,
+            this.height*0.8, title, 0x0A0A0A
+        ));
     }
 
     onPointerOver() {
