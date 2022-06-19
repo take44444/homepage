@@ -6,12 +6,16 @@ import * as TEXT from './text.js'
 import * as SPECTRUM from './spectrum.js';
 import * as MENU from './menu.js';
 import * as STATUS from './statusline.js';
+import * as AUDIO from './audio.js';
 
 let app;
 let quality;
 let spectrum;
 let menu;
 let statusline;
+let playButton;
+let playButtonBg;
+let audio;
 
 WebFont.load({
     google: { families: ['Noto Sans Mono'] },
@@ -19,13 +23,17 @@ WebFont.load({
     inactive: () => alert('font loading failed')
 });
 
-
-
 let time;
 function animate(delta) {
     // time += delta;
     time += app.ticker.deltaMS/1000;
-    spectrum.update([], time);
+
+    if (audio.status === 2) {
+        audio.getAudio();
+        spectrum.update(audio.freqs.slice(0, 8), time);
+    } else {
+        spectrum.update([0], time);
+    }
     menu.update(app.ticker.deltaMS/1000);
     statusline.update();
     if ((time - Math.floor(time)) > 0.975)
@@ -40,6 +48,7 @@ function animate(delta) {
 }
 
 function init() {
+    audio = new AUDIO.Audio('bgm.mp3');
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // initialize
     time = 0;
@@ -58,6 +67,35 @@ function init() {
             .beginFill(0xD8D8FF)
             .drawRect(0, 0, app.screen.width, app.screen.height)
             .endFill());
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // create play button
+
+    let height = 30*quality;
+    let x = app.screen.width/2 - height*0.48*8;
+    let y = 750*quality
+    playButton = new PIXI.Container();
+    playButtonBg = new PIXI.Graphics()
+        .beginFill(0x888888)
+        .drawRoundedRect(x, y, height*0.48*16, height, height*0.125)
+        .endFill();
+    playButton.addChild(playButtonBg);
+    playButton.addChild(TEXT.Text(
+        x+height*0.48, y+height*0.1,
+        height*0.8, 'Play to start!', 0x0A0A0A
+    ));
+    playButton.interactive = true;
+    playButton.buttonMode = true;
+    playButton.on('pointertap', () => {
+        if (audio.status !== 1) return;
+        playButtonBg.clear();
+        playButtonBg.beginFill(0x444444)
+            .drawRoundedRect(x, y, height*0.48*16, height, height*0.125)
+            .endFill();
+        audio.status = 2;
+        audio.play();
+    });
+    app.stage.addChild(playButton);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // create name

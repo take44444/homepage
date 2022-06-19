@@ -29,6 +29,7 @@ export class NcsSpectrum extends Spectrum {
         this.dx = this.formSize / this.div[0];
         this.dy = this.formSize / this.div[1];
         this.displacement = (op.displacement ? op.displacement : 40.0) * this.quality;
+        // this.zoom = (op.zoom ? op.zoom : 0.0) * this.quality;
         let size = (op.size ? op.size : 2.5) * this.quality;
         let color = op.color !== undefined ? op.color : 0xFFFF00;
         this.noiseOptions = op.noiseOptions ? op.noiseOptions
@@ -57,9 +58,10 @@ export class NcsSpectrum extends Spectrum {
 
     update(data, time) {
         let sound_ave = data.length ?
-            data.reduce((a, b) => a + b, 0) / data.length
+            data.reduce((a, b) => a + b, 0) / data.length / 150
             : (Math.sin(time) + 2) * 0.6666667;
         let displacement = sound_ave * this.displacement;
+        // let r = this.r + sound_ave * this.zoom;
 
         let scale = this.noiseOptions.scale;
         let octaves = this.noiseOptions.octaves;

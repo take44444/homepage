@@ -18,9 +18,11 @@ function easeInExpo(x) {
 
 export class Menu {
     // menuInfoList = [{title: string, content: [object, ...]}, ...]
-    constructor(x1, y1, width, height, itemHeight, x2, y2, lineHeight, maxLines, menuInfoList) {
+    constructor(x1, y1, width, height, itemHeight,
+    x2, y2, lineHeight, maxLines, menuInfoList) {
         this.itemHeight = itemHeight;
-        this.interval = (height - this.itemHeight * menuInfoList.length) / (menuInfoList.length - 1);
+        this.interval = (height-this.itemHeight*menuInfoList.length)/
+            (menuInfoList.length-1);
         this.x1 = x1;
         this.y1 = y1;
 
@@ -30,12 +32,15 @@ export class Menu {
         this.contentContainer = new PIXI.Container();
         for (let i=0; i<menuInfoList.length; i++) {
             this.buttons[i] = new MenuButton(
-                this.x1, this.y1 + (this.interval + this.itemHeight) * i, width, this.itemHeight,
+                this.x1, this.y1+(this.interval+this.itemHeight)*i,
+                width, this.itemHeight,
                 menuInfoList[i].title, () => this.point(i), () => this.select(i)
             );
             this.buttonContainer.addChild(this.buttons[i].container);
             this.contents[i] = new PIXI.Container();
-            let [_, line] = JSON_TEXT.addJsonTexts2Container(x2, y2, lineHeight, menuInfoList[i], 0, 1, 0, this.contents[i]);
+            let [_, line] = JSON_TEXT.addJsonTexts2Container(
+                x2, y2, lineHeight, menuInfoList[i], 0, 1, 0, this.contents[i]
+            );
             for (let l=line+1; l<=maxLines; l++) {
                 this.contents[i].addChild(JSON_TEXT.lineNumText(x2, y2, l, lineHeight));
             }
@@ -66,7 +71,6 @@ export class Menu {
     update(delta) {
         for (let i=0; i<this.buttons.length; i++) {
             this.buttons[i].update(delta);
-            // this.contents[i].update(delta);
         }
     }
 }
@@ -102,7 +106,7 @@ class MenuButton {
         this.container.addChild(this.rect);
 
         this.container.addChild(TEXT.Text(
-            x+this.maxWidth*0.05, y+this.height*0.1,
+            x+this.height*0.48, y+this.height*0.1,
             this.height*0.8, title, 0x0A0A0A
         ));
     }
