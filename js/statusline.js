@@ -27,10 +27,10 @@ class Fps {
 
 export class StatusLine {
     constructor(x, y, width, height) {
-        this.x = x;
-        this.y = y;
+        x = x;
+        y = y;
         this.width = width;
-        this.height = height;
+        height = height;
         this.container = new PIXI.Container();
         this.fps = new Fps();
         let items = [];
@@ -69,24 +69,19 @@ export class StatusLine {
             .beginFill(0xAAFF00)
             .drawRect(last, y, width*0.15, height)
             .endFill());
-        this.fpsContainer = new PIXI.Container();
-        this.fpsContainer.addChild(TEXT.Text(
-            this.x+this.width-this.height*0.48*(this.fps.val.length+1),
-            this.y+this.height*0.1, this.height*0.8, this.fps.val, 0x000000
-        ));
+        this.fpsText = TEXT.Text(
+            x+this.width-height*0.48*(this.fps.val.length+1),
+            y+height*0.1, height*0.8, this.fps.val, 0x000000
+        );
     
         this.container.addChild(
             items[0], items[1], items[2], items[3],
-            items[4], items[5], items[6], this.fpsContainer
+            items[4], items[5], items[6], this.fpsText
         );
     }
 
     update() {
         this.fps.update();
-        this.fpsContainer.removeChild(this.fpsContainer.children[0]);
-        this.fpsContainer.addChild(TEXT.Text(
-            this.x+this.width-this.height*0.48*(this.fps.val.length+1),
-            this.y+this.height*0.1, this.height*0.8, this.fps.val, 0x000000
-        ));
+        this.fpsText.text = this.fps.val;
     }
 }
