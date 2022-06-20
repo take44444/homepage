@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import {GlowFilter} from '@pixi/filter-glow';
 import * as TEXT from './text.js'
 /* CONST */
 const SMOOTHING = 0.85;
@@ -45,7 +46,7 @@ export class Audio {
         request.send();
         this.container = new PIXI.Container();
         this.rect = new PIXI.Graphics()
-            .beginFill(0x00BBFF)
+            .beginFill(0x0077FF)
             .drawRoundedRect(x, y, height*2.88, height, height*0.125)
             .endFill();
         this.container.addChild(this.rect);
@@ -65,7 +66,7 @@ export class Audio {
         if (this.status === 0) return;
         if (this.status === 2) {
             this.rect.clear();
-            this.rect.beginFill(0x00BBFF)
+            this.rect.beginFill(0x0077FF)
                 .drawRoundedRect(
                     this.x, this.y, this.height*0.48*6, this.height,
                     this.height*0.125

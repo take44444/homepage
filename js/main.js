@@ -67,6 +67,9 @@ function init() {
     audio = new AUDIO.Audio('bgm.mp3',
         app.screen.width/2-30*2.88*quality/2, 750*quality, 30*quality
     );
+    audio.container.filters = [new GlowFilter(
+        { distance: 30*quality, outerStrength: 1.5, color: 0x555555 }
+    )];
     app.stage.addChild(audio.container);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,8 +112,8 @@ function init() {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // create Menu
     menu = new MENU.Menu(
-        800*quality, 200*quality, 350*quality, 170*quality, 35*quality,
-        1190*quality, 52*quality, 23*quality, 32,
+        840*quality, 200*quality, 220*quality, 170*quality, 35*quality,
+        1130*quality, 52*quality, 23*quality, 32,
         [
             {
                 title: "SNS",
