@@ -1,4 +1,4 @@
-import * as TEXT from './text.js'
+import * as UTIL from './util.js'
 
 export function addJsonTexts2Container(
     x, y, lineHeight, json, posX, line, depth, container
@@ -72,7 +72,7 @@ export function lineNumText(x, y, line, lineHeight) {
 
 function textAt(x, y, lineHeight, line, posX, string, color) {
     let charWidth = lineHeight*0.8*0.6;
-    return TEXT.Text(
+    return UTIL.text(
         x+(3+posX)*charWidth, y+lineHeight*(line-0.9), lineHeight*0.8,
         string, color
     );

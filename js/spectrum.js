@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import * as UTIL from './util.js'
 import * as NOISE from './noise.js';
 
 function v_add(a,b) { return [a[0]+b[0],a[1]+b[1],a[2]+b[2]]; }
@@ -28,7 +29,7 @@ export class NcsSpectrum extends Spectrum {
         this.div = op.div ? op.div : [150, 150];
         this.dx = this.formSize / this.div[0];
         this.dy = this.formSize / this.div[1];
-        this.displacement = (op.displacement ? op.displacement : 70.0) * this.quality;
+        this.displacement = (op.displacement ? op.displacement : 80.0) * this.quality;
         // this.zoom = (op.zoom ? op.zoom : 0.0) * this.quality;
         let size = (op.size ? op.size : 2.5) * this.quality;
         let color = op.color !== undefined ? op.color : 0xFFFF00;
@@ -54,6 +55,7 @@ export class NcsSpectrum extends Spectrum {
                 this.container.addChild(circle);
             }
         }
+        this.container.filters = [UTIL.glowFilter(color, 30*this.quality)];
     }
 
     update(data, time) {

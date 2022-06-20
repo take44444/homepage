@@ -1,8 +1,7 @@
 import * as PIXI from 'pixi.js';
-import {GlowFilter} from '@pixi/filter-glow';
 import {CRTFilter} from '@pixi/filter-crt';
 import {GlitchFilter} from '@pixi/filter-glitch';
-import * as TEXT from './text.js'
+import * as UTIL from './util.js'
 import * as SPECTRUM from './spectrum.js';
 import * as MENU from './menu.js';
 import * as STATUS from './statusline.js';
@@ -13,9 +12,8 @@ let quality;
 let spectrum;
 let menu;
 let statusline;
-let playButton;
-let playButtonBg;
 let audio;
+let audioTime;
 
 WebFont.load({
     google: { families: ['Noto Sans Mono'] },
@@ -28,6 +26,13 @@ function animate(delta) {
     // time += delta;
     time += app.ticker.deltaMS/1000;
     spectrum.update(audio.getAudio().slice(0, 8), time);
+    audioTime.text = `${
+        (('00')+Math.floor(audio.ctx.currentTime/60)).slice(-2)
+    }:${
+        (('00')+Math.floor(audio.ctx.currentTime)%60).slice(-2)
+    }:${
+        (('00')+audio.ctx.currentTime.toFixed(2)).slice(-2)
+    }`;
 
     menu.update(app.ticker.deltaMS/1000);
     statusline.update();
@@ -67,36 +72,25 @@ function init() {
     audio = new AUDIO.Audio('bgm.mp3',
         app.screen.width/2-30*2.88*quality/2, 750*quality, 30*quality
     );
-    audio.container.filters = [new GlowFilter(
-        { distance: 30*quality, outerStrength: 1.5, color: 0x555555 }
-    )];
     app.stage.addChild(audio.container);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // create name
-    let name = TEXT.Text(100*quality, 50*quality, 35*quality,
+    let name = UTIL.text(100*quality, 50*quality, 35*quality,
         'Takeshi Masumoto', 0x0A0A0A
     );
-    name.filters = [
-        new GlowFilter(
-            { distance: 30*quality, outerStrength: 1.2, color: 0x0A0A0A }
-        )
-    ];
+    name.filters = [UTIL.glowFilter(0x0A0A0A, 40*quality)];
     app.stage.addChild(name);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // create theme
-    let theme = TEXT.Text(0, 0, 35*quality, 'Creativity', 0x0077FF);
-    theme.anchor.x = 0.5;
-    theme.anchor.y = 0.5;
-    theme.x = 420*quality;
-    theme.y = 450*quality;
-    theme.filters = [
-        new GlowFilter(
-            { distance: 30*quality, outerStrength: 1.2, color: 0x0077FF }
-        )
-    ];
-    app.stage.addChild(theme);
+    // create audioTime
+    audioTime = UTIL.text(0, 0, 45*quality, '00:00', 0x0077FF);
+    audioTime.anchor.x = 0.5;
+    audioTime.anchor.y = 0.5;
+    audioTime.x = 430*quality;
+    audioTime.y = 450*quality;
+    audioTime.filters = [UTIL.glowFilter(0x0077FF, 40*quality)];
+    app.stage.addChild(audioTime);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // create NcsSpectrum
@@ -104,9 +98,8 @@ function init() {
         { quality: quality, color: 0x0A0A0A, div: [120, 120] }
     );
     let spectrumContainer = spectrum.container;
-    spectrumContainer.x = 420*quality;
+    spectrumContainer.x = 430*quality;
     spectrumContainer.y = 450*quality;
-    spectrumContainer.filters = [new GlowFilter({ distance: 30*quality, outerStrength: 1.5, color: 0x000000 })];
     app.stage.addChild(spectrumContainer);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,7 +179,6 @@ function init() {
             },
         ]
     );
-    menu.buttonContainer.filters = [new GlowFilter({ distance: 30*quality, outerStrength: 1.5, color: 0x555555 })];
     app.stage.addChild(menu.buttonContainer);
     app.stage.addChild(menu.contentContainer);
 

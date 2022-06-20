@@ -1,8 +1,7 @@
 import * as PIXI from 'pixi.js';
-import {GlowFilter} from '@pixi/filter-glow';
-import * as TEXT from './text.js'
+import * as UTIL from './util.js'
 /* CONST */
-const SMOOTHING = 0.85;
+const SMOOTHING = 0.5;
 const FFT_SIZE = 1024;
 
 export class Audio {
@@ -50,12 +49,12 @@ export class Audio {
             .drawRoundedRect(x, y, height*2.88, height, height*0.125)
             .endFill();
         this.container.addChild(this.rect);
-        this.text = TEXT.Text(
+        this.text = UTIL.text(
             x+height*0.48, y+height*0.1,
             height*0.8, 'Play', 0x0A0A0A
         );
         this.container.addChild(this.text);
-    
+        this.container.filters = [UTIL.glowFilter(0x555555, height)];
         this.onTap = this.onTap.bind(this);
         this.container.interactive = true;
         this.container.buttonMode = true;
@@ -88,12 +87,6 @@ export class Audio {
             else this.ctx.resume();
             this.status = 2;
         }
-    }
-
-    onTapStop() {
-        
-
-        this.container.on('pointertap', this.onTapPlay);
     }
 
     getAudio() {

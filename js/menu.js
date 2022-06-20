@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import * as JSON_TEXT from './json-text.js';
-import * as TEXT from './text.js'
+import * as UTIL from './util.js'
 
 const EASE_TIME = 2;
 
@@ -45,11 +45,13 @@ export class Menu {
                 this.contents[i].addChild(JSON_TEXT.lineNumText(x2, y2, l, lineHeight));
             }
         }
-        this.pointer = TEXT.Text(
+        this.pointer = UTIL.text(
             this.x1-this.itemHeight*0.8, this.y1+this.itemHeight*0.1,
             this.itemHeight*0.8, '>', 0x0A0A0A
         );
         this.buttonContainer.addChild(this.pointer);
+        this.buttonContainer.filters = [UTIL.glowFilter(0x888888, itemHeight)];
+        this.contentContainer.filters = [UTIL.glowFilter(0x888888, lineHeight)];
         this.point(0);
         this.selected = 0;
         this.select(0);
@@ -105,7 +107,7 @@ class MenuButton {
             .endFill();
         this.container.addChild(this.rect);
 
-        this.container.addChild(TEXT.Text(
+        this.container.addChild(UTIL.text(
             x+this.height*0.48, y+this.height*0.1,
             this.height*0.8, title, 0x0A0A0A
         ));

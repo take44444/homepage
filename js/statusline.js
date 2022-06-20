@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import * as TEXT from './text.js'
+import * as UTIL from './util.js'
 
 class Fps {
     constructor() {
@@ -40,7 +40,7 @@ export class StatusLine {
             .beginFill(0x00BBFF)
             .drawRect(last, y, width*0.1, height)
             .endFill());
-        items.push(TEXT.Text(
+        items.push(UTIL.text(
             last+(width*0.1-height*0.48*6)/2, y+height*0.1, height*0.8,
             'STATUS', 0x000000
         ));
@@ -50,7 +50,7 @@ export class StatusLine {
             .beginFill(0x222222)
             .drawRect(last, y, width*0.45, height)
             .endFill());
-        items.push(TEXT.Text(last+height*0.48, y+height*0.1, height*0.8,
+        items.push(UTIL.text(last+height*0.48, y+height*0.1, height*0.8,
             'Copyright © 2022 Takeshi Masumoto', 0xD8D8FF
         ));
         last = x + width*0.55;
@@ -59,7 +59,7 @@ export class StatusLine {
             .beginFill(0x111111)
             .drawRect(last, y, width*0.3, height)
             .endFill());
-        items.push(TEXT.Text(
+        items.push(UTIL.text(
             last+width*0.3-height*0.48*21, y+height*0.1, height*0.8,
             '~/Documents/profile/', 0xD8D8FF
         ));
@@ -69,7 +69,7 @@ export class StatusLine {
             .beginFill(0xAAFF00)
             .drawRect(last, y, width*0.15, height)
             .endFill());
-        this.fpsText = TEXT.Text(
+        this.fpsText = UTIL.text(
             x+this.width-height*0.48*(this.fps.val.length+1),
             y+height*0.1, height*0.8, this.fps.val, 0x000000
         );
