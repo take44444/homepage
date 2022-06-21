@@ -82,21 +82,21 @@ export class NcsSpectrum extends Spectrum {
 
                 // fractal field
                 let nx = this.noise.fbm(
-                    p[0]*scale+time* 0 + offset[0]+100,
-                    p[1]*scale+time* 1 + offset[1]+100,
-                    p[2]*scale+time* 0 + offset[2]+100,
+                    p[0]*scale + offset[0]+1000,
+                    p[1]*scale + offset[1]+1000,
+                    time*1.8+1000,
                     octaves, lacunarity, gain
                 );
                 let ny = this.noise.fbm(
-                    p[0]*scale+time* 0 + offset[0]+200,
-                    p[1]*scale+time* 0 + offset[1]+200,
-                    p[2]*scale+time* 1 + offset[2]+200,
+                    p[0]*scale + offset[0]+2000,
+                    p[1]*scale + offset[1]+2000,
+                    time*1.8+2000,
                     octaves, lacunarity, gain
                 );
                 let nz = this.noise.fbm(
-                    p[0]*scale+time* 1 + offset[0]+300,
-                    p[1]*scale+time* 0 + offset[1]+300,
-                    p[2]*scale+time* 0 + offset[2]+300,
+                    p[0]*scale + offset[0]+3000,
+                    p[1]*scale + offset[1]+3000,
+                    time*1.8+3000,
                     octaves, lacunarity, gain
                 );
                 p = v_add(p,[nx * displacement, ny * displacement, nz * displacement]);
