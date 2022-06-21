@@ -37,7 +37,7 @@ export class NcsSpectrum extends Spectrum {
             : {
                 scale      : 0.01 / this.quality,
                 octaves    : 1,
-                flow       : [0, 1.5, 0],
+                flow       : [0, 2.0, 0],
                 lacunarity : 1.5,
                 gain       : 0.25,
             };
