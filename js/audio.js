@@ -33,6 +33,8 @@ export class Audio {
                     this.source.connect(this.analyser);
                     this.source.buffer = buffer;
                     this.source.loop = true;
+                    this.source.start(0);
+                    this.ctx.suspend();
                 },
                 _ => {
                     throw 'decodeAudioData error';
@@ -71,7 +73,7 @@ export class Audio {
                     this.height*0.125
                 )
                 .endFill();
-            this.status = 3;
+            this.status = 1;
             this.text.text = 'Play';
             this.ctx.suspend();
         } else {
@@ -83,8 +85,7 @@ export class Audio {
                 )
                 .endFill();
             this.text.text = 'Stop';
-            if (this.status === 1) this.source.start(0);
-            else this.ctx.resume();
+            this.ctx.resume();
             this.status = 2;
         }
     }
