@@ -33,7 +33,7 @@ const Form = (props) => {
         p.current[i][j][1] = cvs*pp[1];
       }
     }
-  });
+  }, [props.t]);
 
   return (
     loaded &&
@@ -48,7 +48,7 @@ const Form = (props) => {
         />
       ))))}
     </Container>
-  )
+  );
 }
 
 export { Form };
