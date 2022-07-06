@@ -12,7 +12,7 @@ import { CRTFilter } from '@pixi/filter-crt';
 
 const Main = () => {
   const [loaded, setLoaded] = useState(false);
-  const [data, update] = useReducer((_, data) => data, {aTime: 0, vol: 0});
+  const [data, update] = useReducer((_, data) => data, {delta: 0, aTime: 0, vol: 0});
   function onLoad() { setLoaded(true); }
   const audio = useRef(null);
   useEffect(() => {
