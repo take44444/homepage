@@ -1,25 +1,97 @@
-import logo from './logo.svg';
-import './App.css';
+import { Container, Stage, useTick } from '@inlet/react-pixi';
+import { Form } from './form';
+import { Menu } from './menu';
+import { INTERESTS, OTHER, SNS } from './profile';
+import { StatusLine } from './statusline';
+import { FractalField, SphericalField } from './field';
+import { useEffect, useReducer, useRef, useState } from 'react';
+import { Audio, AudioPlayer, AudioTimeText } from './audio';
+import { Rect, UText } from './util';
+import { GlowFilter } from '@pixi/filter-glow';
+import { CRTFilter } from '@pixi/filter-crt';
 
-function App() {
+const Main = () => {
+  const [loaded, setLoaded] = useState(false);
+  const [data, update] = useReducer((_, data) => data, {aTime: 0, vol: 0});
+  function onLoad() { setLoaded(true); }
+  const audio = useRef(null);
+  useEffect(() => {
+    audio.current = new Audio('/bgm.mp3', onLoad);
+  }, []);
+  useTick(delta => {
+    const audioData = audio.current.getAudio().slice(0, 8);
+    const vol = audioData.reduce((a, b)=>a+b, 0)/audioData.length/200;
+    update({delta: delta/50, aTime: audio.current.ctx.currentTime, vol: vol});
+  });
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    loaded &&
+    <>
+    <UText text={'Takeshi Masumoto'}
+      x={100} y={50} h={35} col={0x0A0A0A}
+      filters={[
+        new GlowFilter({distance: 40, color: 0x0A0A0A, outerStrength: 1.5})
+      ]}
+    />
+    <AudioPlayer audio={audio.current}
+      x={960-43.2} y={740} h={30}
+      filters={[
+        new GlowFilter({distance: 30, color: 0x555555, outerStrength: 1.5})
+      ]}
+    />
+    <AudioTimeText time={data.aTime}
+      col={0x0077FF} anchor={0.5} x={430} y={450} h={45}
+      filters={[
+        new GlowFilter({distance: 40, color: 0x0077FF, outerStrength: 1.5})
+      ]}
+    />
+    <Form sz={2.5} div={[120, 120]} col={0x0A0A0A}
+      x={430} y={450} w={226} h={226} t={data.aTime} data={data.vol}
+      fields = {[
+        new FractalField({
+          scale: 0.01, flow: [0, 2.0], evolution: 1.8, displace: 80.0
+        }),
+        new SphericalField({
+          r: 280,
+          strength: 107
+        })
+      ]}
+    />
+    <Menu delta={data.delta} mIL={[SNS, INTERESTS, OTHER]}
+      x1={840} y1={200} w={220} h={170} iH={35}
+      x2={1130} y2={52} lH={23} lines={32}
+      filters={[
+        new GlowFilter({distance: 35, color: 0x888888, outerStrength: 1.5})
+      ]}
+    />
+    <StatusLine x={0} y={820} w={1920} h={20} />
+    </>
+  )
 }
+
+const App = () => {
+  // const resolution = Math.min(window.devicePixelRatio, 2);
+  const stageProps = {
+    width: 1920,
+    height: 840,
+    options: {
+      autoDensity: true,
+      // resolution: resolution || 1,
+      // antialias: resolution <= 1,
+      // backgroundColor: 0xD8D8FF,
+    },
+  };
+  return (
+    <Stage {...stageProps}>
+      <Container width={1920} height={840}
+        filters={[
+          new CRTFilter({curvature: 1.2, vignetting: 0.27})
+        ]}
+      >
+        <Rect col={0xD8D8FF} x={0} y={0} w={1920} h={840} />
+        <Main />
+      </Container>
+    </Stage>
+  )
+};
 
 export default App;
