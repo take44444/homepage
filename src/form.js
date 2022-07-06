@@ -16,7 +16,7 @@ const Form = (props) => {
       }
     }
     onLoad();
-  }, [props.div]);
+  }, []);
   useEffect(() => {
     const dx = props.w / props.div[0];
     const dy = props.h / props.div[1];
