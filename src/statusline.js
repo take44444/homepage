@@ -1,29 +1,30 @@
-import { useEffect, useRef } from 'react';
+import { useTick } from '@inlet/react-pixi';
+import { memo, useRef, useState } from 'react';
 import { Rect, UText } from './util'
 
 const Fps = (props) => {
   const cnt = useRef(0);
   const last = useRef(0);
-  const fps = useRef('fps: 0.0');
-  useEffect(() => {
+  const [fps, setFps] = useState('fps: 0.0');
+  useTick(_ => {
     const now = new Date();
     cnt.current += 1;
     if ((now - last.current) > 200) {
-      fps.current = `fps: ${
+      setFps(`fps: ${
         (((200 * cnt.current) / (now - last.current)) * 5).toFixed(1)
-      }`;
+      }`);
       cnt.current = 0;
       last.current = now;
     }
   });
   return (
-    <UText col={0x000000} text={fps.current}
-      x={props.r - props.h * 0.6 * (fps.current.length + 1)} y={props.y} h={props.h}
+    <UText col={0x000000} text={fps}
+      x={props.r - props.h * 0.6 * (fps.length + 1)} y={props.y} h={props.h}
     />
   );
 }
 
-const StatusLine = (props) => {
+const StatusLine = memo((props) => {
   let next = props.x;
   return (
     <>
@@ -56,6 +57,6 @@ const StatusLine = (props) => {
     />
     </>
   )
-}
+});
 
 export { StatusLine };

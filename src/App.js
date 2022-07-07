@@ -1,10 +1,10 @@
-import { Container, Stage, useTick } from '@inlet/react-pixi';
+import { Container, Stage } from '@inlet/react-pixi';
 import { Form } from './form';
 import { Menu } from './menu';
 import { INTERESTS, OTHER, SNS } from './profile';
 import { StatusLine } from './statusline';
 import { FractalField, SphericalField } from './field';
-import { useMemo, useReducer, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Audio, AudioPlayer, AudioTimeText } from './audio';
 import { Rect, UText } from './util';
 import { GlowFilter } from '@pixi/filter-glow';
@@ -12,7 +12,6 @@ import { CRTFilter } from '@pixi/filter-crt';
 
 const Main = () => {
   const [loaded, setLoaded] = useState(false);
-  const [data, update] = useReducer((_, data) => data, {delta: 0, aTime: 0, vol: 0});
   function onLoad() { setLoaded(true); }
   const audio = useMemo(() => new Audio('/bgm.mp3', onLoad), []);
   const fields = useMemo(() => [
@@ -24,11 +23,6 @@ const Main = () => {
       strength: 107
     })
   ], []);
-  useTick(delta => {
-    const audioData = audio.getAudio().slice(0, 8);
-    const vol = audioData.reduce((a, b)=>a+b, 0)/audioData.length/200;
-    update({delta: delta/50, aTime: audio.ctx.currentTime, vol: vol});
-  });
   return (
     loaded &&
     <>
@@ -41,17 +35,17 @@ const Main = () => {
     <AudioPlayer audio={audio}
       x={960-43.2} y={740} h={30}
     />
-    <AudioTimeText time={data.aTime}
+    <AudioTimeText audio={audio}
       col={0x0077FF} anchor={0.5} x={430} y={450} h={45}
       filters={[
         new GlowFilter({distance: 40, color: 0x0077FF, outerStrength: 1.5})
       ]}
     />
     <Form sz={2.5} div={[120, 120]} col={0x0A0A0A}
-      x={430} y={450} w={226} h={226} t={data.aTime} data={data.vol}
+      x={430} y={450} w={226} h={226} audio={audio}
       fields = {fields}
     />
-    <Menu delta={data.delta} mIL={[SNS, INTERESTS, OTHER]}
+    <Menu mIL={[SNS, INTERESTS, OTHER]}
       x1={840} y1={200} w={220} h={170} iH={35}
       x2={1130} y2={52} lH={23} lines={32}
       filters={[

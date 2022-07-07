@@ -1,4 +1,4 @@
-import { Container } from "@inlet/react-pixi";
+import { Container, useTick } from "@inlet/react-pixi";
 import { GlowFilter } from "@pixi/filter-glow";
 import { memo, useState } from "react";
 import { RRect, UText } from "./util";
@@ -30,6 +30,8 @@ class Audio {
           this.src.buffer = buffer;
           this.src.loop = true;
           this.status = 1;
+          this.src.start(0);
+          this.ctx.suspend();
           onLoad();
         },
         _ => {
@@ -53,16 +55,14 @@ class Audio {
 
   play() {
     if (this.status === 0) return;
-    else if (this.status === 1) this.src.start(0);
-    else if (this.status === 3) this.ctx.resume();
+    if (this.status === 1) this.ctx.resume();
     this.status = 2;
-    this.ctx.resume();
   }
 
   stop() {
     if (this.status !== 2) return;
     this.ctx.suspend();
-    this.status = 3;
+    this.status = 1;
   }
 }
 
@@ -96,15 +96,19 @@ const AudioPlayer = memo((props) => {
 });
 
 const AudioTimeText = (props) => {
+  const [t, setT] = useState(0);
+  useTick(_ => {
+    setT(props.audio.ctx.currentTime);
+  });
   return (
     <UText {...props}
       text={
         `${
-          (('00')+Math.floor(props.time/60)).slice(-2)
+          (('00')+Math.floor(t/60)).slice(-2)
         }:${
-          (('00')+Math.floor(props.time)%60).slice(-2)
+          (('00')+Math.floor(t)%60).slice(-2)
         }:${
-          (('00')+props.time.toFixed(2)).slice(-2)
+          (('00')+t.toFixed(2)).slice(-2)
         }`
       }
     />

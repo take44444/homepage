@@ -1,46 +1,44 @@
-import { Container } from "@inlet/react-pixi";
+import { Container, useTick } from "@inlet/react-pixi";
 import { GlowFilter } from "@pixi/filter-glow";
-import { memo, useMemo } from "react";
+import { memo, useMemo, useState } from "react";
 import { Circle } from "./util";
 
 const Form = memo((props) => {
-  const dx = props.w / props.div[0];
-  const dy = props.h / props.div[1];
-  const key = useMemo(() => {
-    const ret = new Array(props.div[0]+1);
+  const filters = useMemo(() => [
+    new GlowFilter({distance: 30, color: props.col, outerStrength: 1.5})
+  ], [props.col]);
+  const [p, setP] = useState(
+    new Array((props.div[0]+1)*(props.div[1]+1)).fill({x: 0, y: 0})
+  );
+  useTick(_ => {
+    const dx = props.w / props.div[0];
+    const dy = props.h / props.div[1];
+    const ret = [];
+    const t = props.audio.ctx.currentTime;
+    const audioData = props.audio.getAudio().slice(0, 8);
+    const vol = audioData.reduce((a, b)=>a+b, 0)/audioData.length/200;
+    const fs = [];
+    for (const field of props.fields) fs.push(field.getFunc(vol, t));
+
     for (let i=0; i<=props.div[0]; i++) {
-      ret[i] = new Array(props.div[1]+1);
-      for(let j=0; j<=props.div[1]; j++) {
-        ret[i][j] = `${i}/${j}`;
+      for (let j=0; j<=props.div[1]; j++) {
+        let pp = [(i*dx-props.w/2), (j*dy-props.h/2), 0];
+
+        for (const f of fs) pp = f(pp);
+
+        // Draw with 3d position on 2d coordinate.
+        const cvs = 1024 / (pp[2] + 1024);
+        ret.push({x: cvs*pp[0], y: cvs*pp[1]});
       }
     }
-    return ret;
-  }, []);
-
-  const field = useMemo(() => {
-    const fields = [];
-    for (const f of props.fields)
-      fields.push(f.getFunc(props.data, props.t));
-    return (x, y) => {
-      let pp = [x, y, 0];
-      for (const f of fields)
-        pp = f(pp);
-      const cvs = 1024 / (pp[2] + 1024);
-      return {x: cvs*pp[0], y: cvs*pp[1]};
-    };
-  }, [props.data, props.fields, props.t]);
+    setP(ret);
+  });
 
   return (
-    <Container x={props.x} y={props.y}
-      filters={[
-        new GlowFilter({distance: 30, color: props.col, outerStrength: 1.5})
-      ]}
-    >
-      {key.map((e, i) => (e.map((ee, j) => (
-        <Circle key={ee} col={props.col} sz={props.sz}
-          {...field(i*dx-props.w/2, j*dy-props.h/2)}
-        />
-      ))))}
+    <Container x={props.x} y={props.y} filters={filters}>
+      {p.map((e, i) => (
+        <Circle key={i} col={props.col} sz={props.sz} {...e} />
+      ))}
     </Container>
   );
 });
