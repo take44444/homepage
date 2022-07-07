@@ -1,5 +1,5 @@
 import { Container } from "@inlet/react-pixi";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { JsonContainer } from "./json-text";
 import { RRect, UText } from "./util";
 
@@ -17,22 +17,27 @@ function easeInExpo(x) {
   return clamp(0, 1, x <= 0 ? 0 : Math.pow(2, 10 * x - 10));
 }
 
-const Menu = (props) => {
+const Menu = memo((props) => {
   const [pointed, setPointed] = useState(0);
   const [selected, setSelected] = useState(0);
   const interval = (props.h-props.iH*props.mIL.length)/(props.mIL.length-1);
-  const jsonContainers = [];
-  for (let i=0; i<props.mIL.length; i++) {
-    jsonContainers.push(
-      <>
-      <JsonContainer
-        x={props.x2} y={props.y2} lH={props.lH} json={props.mIL[i]}
-        posX={0} line={1} depth={0} lines={props.lines}
-      />
-      </>
-    );
-  }
+  const [loaded, setLoaded] = useState(false);
+  const jsonContainers = useRef([]);
+  useEffect(() => {
+    for (let i=0; i<props.mIL.length; i++) {
+      jsonContainers.current.push(
+        <>
+        <JsonContainer
+          x={props.x2} y={props.y2} lH={props.lH} json={props.mIL[i]}
+          posX={0} line={1} depth={0} lines={props.lines}
+        />
+        </>
+      );
+    }
+    setLoaded(true);
+  }, [props.x2, props.y2, props.lH, props.lines, props.mIL]);
   return (
+    loaded &&
     <>
     {[...Array(props.mIL.length)].map((_, i) => (
       <MenuButton key={i} title={props.mIL[i].title} delta={props.delta}
@@ -48,11 +53,11 @@ const Menu = (props) => {
       h={props.iH*0.8}
     />
     <ContainerSelector
-      selected={selected} containers={jsonContainers}
+      selected={selected} containers={jsonContainers.current}
     />
     </>
   );
-}
+});
 
 const MenuButton = (props) => {
   const w = useRef(0);

@@ -66,29 +66,26 @@ class Audio {
 }
 
 const AudioPlayer = (props) => {
-  const playing = useRef(false);
-  const [buttonProps, setButtonProps] = useState(
-    {text: 'Play', col: 0x0077FF}
+  const [state, setState] = useState(
+    {playing: false, text: 'Play', col: 0x0077FF}
   );
   const pointerTap = () => {
-    if (playing.current) {
-      setButtonProps({text: 'Play', col: 0x0077FF});
+    if (state.playing) {
+      setState({playing: false, text: 'Play', col: 0x0077FF});
       props.audio.stop();
-      playing.current = false;
     } else {
-      setButtonProps({text: 'Stop', col: 0x444444});
+      setState({playing: true, text: 'Stop', col: 0x444444});
       props.audio.play();
-      playing.current = true;
     }
   }
   return (
     <Container interactive={true} buttonMode={true} pointertap={pointerTap}
       filters={props.filters}
     >
-      <RRect col={buttonProps.col}
+      <RRect col={state.col}
         x={props.x} y={props.y} w={props.h*2.88} h={props.h}
       />
-      <UText text={buttonProps.text} col={0x0A0A0A}
+      <UText text={state.text} col={0x0A0A0A}
         x={props.x+props.h*0.48} y={props.y+props.h*0.1} h={props.h*0.8}
       />
     </Container>

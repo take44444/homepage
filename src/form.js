@@ -1,11 +1,10 @@
 import { Container } from "@inlet/react-pixi";
 import { GlowFilter } from "@pixi/filter-glow";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { Circle } from "./util";
 
-const Form = (props) => {
+const Form = memo((props) => {
   const [loaded, setLoaded] = useState(false);
-  function onLoad() { setLoaded(true); }
   const p = useRef(null);
   useEffect(() => {
     p.current = new Array(props.div[0]+1);
@@ -15,7 +14,7 @@ const Form = (props) => {
         p.current[i][j] = [0, 0];
       }
     }
-    onLoad();
+    setLoaded(true);
   }, []);
   useEffect(() => {
     const dx = props.w / props.div[0];
@@ -49,6 +48,6 @@ const Form = (props) => {
       ))))}
     </Container>
   );
-}
+});
 
 export { Form };

@@ -1,7 +1,7 @@
 import { Container } from "@inlet/react-pixi";
 import { UText } from "./util";
 
-function jsonContainer(props) {
+const jsonContainer = (props) => {
   const jsons = [];
   const gProps = {
     line: props.line, depth: props.depth, posX: props.posX
