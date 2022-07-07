@@ -66,7 +66,6 @@ export class Menu {
     }
 
     point(i) {
-        this.pointed = i;
         this.pointer.y = this.y1 + (this.interval + this.itemHeight) * i + this.itemHeight*0.1;
     }
 

@@ -2,14 +2,17 @@ import * as PIXI from 'pixi.js';
 import {CRTFilter} from '@pixi/filter-crt';
 import {GlitchFilter} from '@pixi/filter-glitch';
 import * as UTIL from './util.js'
-import * as SPECTRUM from './spectrum.js';
+import * as FORM from './form.js';
+import * as FIELD from './field.js'
 import * as MENU from './menu.js';
 import * as STATUS from './statusline.js';
 import * as AUDIO from './audio.js';
 
 let app;
 let quality;
-let spectrum;
+let form;
+let perlinField;
+let sphericalField;
 let menu;
 let statusline;
 let audio;
@@ -23,9 +26,12 @@ WebFont.load({
 
 let time;
 function animate(delta) {
-    // time += delta;
     time += app.ticker.deltaMS/1000;
-    spectrum.update(audio.getAudio().slice(0, 8), time);
+    const audioData = audio.getAudio().slice(0, 8);
+    const input = audioData.reduce((a, b) => a + b, 0) / audioData.length / 200; // (3+Math.sin(time))/3.5;
+    form.pushField(perlinField.getFunc(input, time));
+    form.pushField(sphericalField.getFunc());
+    form.execute();
     audioTime.text = `${
         (('00')+Math.floor(audio.ctx.currentTime/60)).slice(-2)
     }:${
@@ -36,15 +42,6 @@ function animate(delta) {
 
     menu.update(app.ticker.deltaMS/1000);
     statusline.update();
-    if ((time - Math.floor(time)) > 0.975)
-        app.stage.filters = [
-            new CRTFilter({ curvature: 1.2, vignetting: 0.27 }),
-            new GlitchFilter(
-                { slices: 80, offset: Math.sin(time)*30*quality, seed: time }
-            )
-        ];
-    else
-        app.stage.filters = [new CRTFilter({ curvature: 1.2, vignetting: 0.27 })];
 }
 
 function init() {
@@ -61,6 +58,7 @@ function init() {
         backgroundColor: 0x000000,
         autoDensity: true,
     });
+    app.stage.filters = [new CRTFilter({ curvature: 1.2, vignetting: 0.27 })];
     document.getElementById('app').appendChild(app.view);
     app.stage.addChild(new PIXI.Graphics()
             .beginFill(0xD8D8FF)
@@ -93,14 +91,23 @@ function init() {
     app.stage.addChild(audioTime);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // create NcsSpectrum
-    spectrum = new SPECTRUM.NcsSpectrum(
-        { quality: quality, color: 0x0A0A0A, div: [120, 120] }
-    );
-    let spectrumContainer = spectrum.container;
-    spectrumContainer.x = 430*quality;
-    spectrumContainer.y = 450*quality;
-    app.stage.addChild(spectrumContainer);
+    // create form
+    form = new FORM.Form({
+        x: 430*quality, y: 450*quality, w: 226*quality, h: 226*quality,
+        size: 2.5, div: [127, 127], color: 0x0A0A0A
+    });
+    perlinField = new FIELD.PerlinField({
+        scale: 0.01, flow: [0, 2*quality], evolution: 1.8, displace: 80.0*quality
+    });
+    sphericalField = new FIELD.SphericalField({
+        r: 280*quality,
+        strength: 107
+    });
+    form.pushField(perlinField.getFunc(0, time));
+    form.pushField(sphericalField.getFunc());
+    form.execute();
+    form.container.filters = [UTIL.glowFilter(0x0A0A0A, 30*quality)];
+    app.stage.addChild(form.container);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // create Menu
