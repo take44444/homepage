@@ -4,7 +4,7 @@ import { Menu } from './menu';
 import { INTERESTS, OTHER, SNS } from './profile';
 import { StatusLine } from './statusline';
 import { FractalField, SphericalField } from './field';
-import { useEffect, useReducer, useRef, useState } from 'react';
+import { useMemo, useReducer, useState } from 'react';
 import { Audio, AudioPlayer, AudioTimeText } from './audio';
 import { Rect, UText } from './util';
 import { GlowFilter } from '@pixi/filter-glow';
@@ -14,14 +14,20 @@ const Main = () => {
   const [loaded, setLoaded] = useState(false);
   const [data, update] = useReducer((_, data) => data, {delta: 0, aTime: 0, vol: 0});
   function onLoad() { setLoaded(true); }
-  const audio = useRef(null);
-  useEffect(() => {
-    audio.current = new Audio('/bgm.mp3', onLoad);
-  }, []);
+  const audio = useMemo(() => new Audio('/bgm.mp3', onLoad), []);
+  const fields = useMemo(() => [
+    new FractalField({
+      scale: 0.01, flow: [0, 2.0], evolution: 1.8, displace: 80.0
+    }),
+    new SphericalField({
+      r: 280,
+      strength: 107
+    })
+  ], []);
   useTick(delta => {
-    const audioData = audio.current.getAudio().slice(0, 8);
+    const audioData = audio.getAudio().slice(0, 8);
     const vol = audioData.reduce((a, b)=>a+b, 0)/audioData.length/200;
-    update({delta: delta/50, aTime: audio.current.ctx.currentTime, vol: vol});
+    update({delta: delta/50, aTime: audio.ctx.currentTime, vol: vol});
   });
   return (
     loaded &&
@@ -32,11 +38,8 @@ const Main = () => {
         new GlowFilter({distance: 40, color: 0x0A0A0A, outerStrength: 1.5})
       ]}
     />
-    <AudioPlayer audio={audio.current}
+    <AudioPlayer audio={audio}
       x={960-43.2} y={740} h={30}
-      filters={[
-        new GlowFilter({distance: 30, color: 0x555555, outerStrength: 1.5})
-      ]}
     />
     <AudioTimeText time={data.aTime}
       col={0x0077FF} anchor={0.5} x={430} y={450} h={45}
@@ -46,15 +49,7 @@ const Main = () => {
     />
     <Form sz={2.5} div={[120, 120]} col={0x0A0A0A}
       x={430} y={450} w={226} h={226} t={data.aTime} data={data.vol}
-      fields = {[
-        new FractalField({
-          scale: 0.01, flow: [0, 2.0], evolution: 1.8, displace: 80.0
-        }),
-        new SphericalField({
-          r: 280,
-          strength: 107
-        })
-      ]}
+      fields = {fields}
     />
     <Menu delta={data.delta} mIL={[SNS, INTERESTS, OTHER]}
       x1={840} y1={200} w={220} h={170} iH={35}

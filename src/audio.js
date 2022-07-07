@@ -1,5 +1,6 @@
 import { Container } from "@inlet/react-pixi";
-import { useRef, useState } from "react";
+import { GlowFilter } from "@pixi/filter-glow";
+import { memo, useState } from "react";
 import { RRect, UText } from "./util";
 
 const SMOOTHING = 0.7;
@@ -65,7 +66,7 @@ class Audio {
   }
 }
 
-const AudioPlayer = (props) => {
+const AudioPlayer = memo((props) => {
   const [state, setState] = useState(
     {playing: false, text: 'Play', col: 0x0077FF}
   );
@@ -80,7 +81,9 @@ const AudioPlayer = (props) => {
   }
   return (
     <Container interactive={true} buttonMode={true} pointertap={pointerTap}
-      filters={props.filters}
+      filters={[
+        new GlowFilter({distance: 30, color: 0x555555, outerStrength: 1.5})
+      ]}
     >
       <RRect col={state.col}
         x={props.x} y={props.y} w={props.h*2.88} h={props.h}
@@ -90,7 +93,7 @@ const AudioPlayer = (props) => {
       />
     </Container>
   );
-}
+});
 
 const AudioTimeText = (props) => {
   return (

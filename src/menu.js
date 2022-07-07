@@ -1,5 +1,5 @@
 import { Container } from "@inlet/react-pixi";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useMemo, useRef, useState } from "react";
 import { JsonContainer } from "./json-text";
 import { RRect, UText } from "./util";
 
@@ -21,23 +21,19 @@ const Menu = memo((props) => {
   const [pointed, setPointed] = useState(0);
   const [selected, setSelected] = useState(0);
   const interval = (props.h-props.iH*props.mIL.length)/(props.mIL.length-1);
-  const [loaded, setLoaded] = useState(false);
-  const jsonContainers = useRef([]);
-  useEffect(() => {
+  const jsonContainers = useMemo(() => {
+    const ret = [];
     for (let i=0; i<props.mIL.length; i++) {
-      jsonContainers.current.push(
-        <>
+      ret.push(
         <JsonContainer
           x={props.x2} y={props.y2} lH={props.lH} json={props.mIL[i]}
           posX={0} line={1} depth={0} lines={props.lines}
         />
-        </>
       );
     }
-    setLoaded(true);
-  }, [props.x2, props.y2, props.lH, props.lines, props.mIL]);
+    return ret;
+  }, [props.x2, props.y2, props.lH, props.lines]);
   return (
-    loaded &&
     <>
     {[...Array(props.mIL.length)].map((_, i) => (
       <MenuButton key={i} title={props.mIL[i].title} delta={props.delta}
@@ -53,7 +49,7 @@ const Menu = memo((props) => {
       h={props.iH*0.8}
     />
     <ContainerSelector
-      selected={selected} containers={jsonContainers.current}
+      selected={selected} containers={jsonContainers}
     />
     </>
   );
@@ -65,23 +61,21 @@ const MenuButton = (props) => {
   const isOver = useRef(false);
   const t = useRef(EASE_TIME);
 
-  useEffect(() => {
-    if (props.selected) {
-      col.current = 0x444444;
-      t.current = EASE_TIME;
-      w.current = props.maxW;
-      isOver.current = false;
+  if (props.selected) {
+    col.current = 0x444444;
+    t.current = EASE_TIME;
+    w.current = props.maxW;
+    isOver.current = false;
+  } else {
+    col.current = 0x888888;
+    if (isOver.current) {
+      t.current = Math.min(EASE_TIME, t.current+props.delta);
+      w.current = easeOutExpo(t.current / EASE_TIME) * props.maxW;
     } else {
-      col.current = 0x888888;
-      if (isOver.current) {
-        t.current = Math.min(EASE_TIME, t.current+props.delta);
-        w.current = easeOutExpo(t.current / EASE_TIME) * props.maxW;
-      } else {
-        t.current = Math.min(EASE_TIME, t.current+props.delta);
-        w.current = (1 - easeOutExpo(t.current / EASE_TIME)) * props.maxW;
-      }
+      t.current = Math.min(EASE_TIME, t.current+props.delta);
+      w.current = (1 - easeOutExpo(t.current / EASE_TIME)) * props.maxW;
     }
-  });
+  }
 
   const pointerOver = () => {
     props.onPoint();
@@ -110,9 +104,9 @@ const MenuButton = (props) => {
       />
     </Container>
   );
-}
-const ContainerSelector = (props) => {
+};
+const ContainerSelector = memo((props) => {
   return props.containers[props.selected];
-}
+});
 
 export { Menu };

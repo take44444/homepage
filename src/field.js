@@ -1,24 +1,24 @@
 import { lerp, PerlinNoise } from "./noise";
 
 function v3Len(a) {
-    return Math.sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2]);
+  return Math.sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2]);
 }
 
 function v3Add(a, b) {
-    return [a[0]+b[0], a[1]+b[1], a[2]+b[2]];
+  return [a[0]+b[0], a[1]+b[1], a[2]+b[2]];
 }
 
 function v3Scale(a, s) {
-    return [a[0]*s, a[1]*s, a[2]*s];
+  return [a[0]*s, a[1]*s, a[2]*s];
 }
 
 function v2Scale(a, s) {
-    return [a[0]*s, a[1]*s];
+  return [a[0]*s, a[1]*s];
 }
 
 class Field {
   getFunc(_value, _time) {
-      throw new Error('Not implemented!');
+    throw new Error('Not implemented!');
   }
 }
 

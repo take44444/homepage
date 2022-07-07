@@ -1,4 +1,4 @@
-import {  Graphics, PixiComponent, Text } from '@inlet/react-pixi'
+import { Graphics, PixiComponent, Text } from '@inlet/react-pixi'
 import { TextStyle, Graphics as PGraphics } from 'pixi.js';
 import { useCallback } from 'react';
 
