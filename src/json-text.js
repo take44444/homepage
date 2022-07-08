@@ -1,4 +1,5 @@
 import { Container } from "@inlet/react-pixi";
+import { memo, useMemo } from "react";
 import { UText } from "./util";
 
 const jsonContainer = (props) => {
@@ -108,29 +109,31 @@ const jsonContainer = (props) => {
   ];
 }
 
-const JsonContainer = (props) => {
-  const jC = jsonContainer(props);
+const JsonContainer = memo((props) => {
+  const jC = useMemo(() => {
+    return jsonContainer(Object.assign({posX: 0, line: 1, depth: 0}, props));
+  }, []);
   return (
-    <>
-     {jC[2]}
+    <Container alpha={props.alpha}>
+      {jC[2]}
       {[...Array(props.lines-jC[1])].map((_, i) => (
-      <LineNumText key={`${jC[1]+1+i}/-3`}
-        x={props.x} y={props.y} lH={props.lH} line={jC[1]+1+i}
-      />
-    ))}
-    </>
+        <LineNumText key={`${jC[1]+1+i}/-3`}
+          x={props.x} y={props.y} lH={props.lH} line={jC[1]+1+i}
+        />
+      ))}
+    </Container>
   )
-}
+});
 
-const LineNumText = (props) => {
+const LineNumText = memo((props) => {
   return (
     <TextAt text={`${('  ' + props.line).slice(-2)}`} col={0x666666}
       x={props.x} y={props.y} lH={props.lH} line={props.line} posX={-3}
     /> 
   )
-}
+});
 
-const TextAt = (props) => {
+const TextAt = memo((props) => {
   return (
     <UText text={props.text} col={props.col}
       x={props.x+(3+props.posX)*props.lH*0.48}
@@ -140,6 +143,6 @@ const TextAt = (props) => {
       pointertap={props.pointertap || false}
     />
   )
-}
+});
 
 export { JsonContainer, LineNumText };

@@ -1,5 +1,6 @@
-import { Container, useTick } from "@inlet/react-pixi";
-import { memo, useMemo, useRef, useState } from "react";
+import { Container } from "@inlet/react-pixi";
+import { GlowFilter } from "@pixi/filter-glow";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { JsonContainer } from "./json-text";
 import { RRect, UText } from "./util";
 
@@ -20,27 +21,19 @@ function easeInExpo(x) {
 const Menu = memo((props) => {
   const [pointed, setPointed] = useState(0);
   const [selected, setSelected] = useState(0);
-  const interval = (props.h-props.iH*props.mIL.length)/(props.mIL.length-1);
-  const jsonContainers = useMemo(() => {
-    const ret = [];
-    for (let i=0; i<props.mIL.length; i++) {
-      ret.push(
-        <JsonContainer
-          x={props.x2} y={props.y2} lH={props.lH} json={props.mIL[i]}
-          posX={0} line={1} depth={0} lines={props.lines}
-        />
-      );
-    }
-    return ret;
-  }, [props.x2, props.y2, props.lH, props.lines]);
+  const interval = (props.h - props.iH*props.dL.length)
+    / (props.dL.length-1);
+  const filters = useMemo(() => [
+    new GlowFilter({distance: 35, color: 0x888888, outerStrength: 1.5})
+  ], []);
   return (
     <>
-    {[...Array(props.mIL.length)].map((_, i) => (
-      <MenuButton key={i} title={props.mIL[i].title}
+    {[...Array(props.dL.length)].map((_, i) => (
+      <MenuButton key={i} title={props.dL[i].title}
         x={props.x1} y={props.y1+(interval+props.iH)*i}
         maxW={props.w} h={props.iH} selected={selected===i}
+        filters={filters} delta={props.delta}
         onPoint={()=>{setPointed(i)}} onSelect={()=>{setSelected(i)}}
-        filters={props.filters}
       />
     ))}
     <UText text={'>'} col={0x0A0A0A}
@@ -48,9 +41,11 @@ const Menu = memo((props) => {
       y={props.y1+(interval+props.iH)*pointed+props.iH*0.1}
       h={props.iH*0.8}
     />
-    <ContainerSelector
-      selected={selected} containers={jsonContainers}
-    />
+    {props.dL.map((d, i) => (
+      <JsonContainer key={i} x={props.x2} y={props.y2} lH={props.lH}
+        json={d} lines={props.lines} alpha={selected === i ? 1 : 0}
+      />
+    ))}
     </>
   );
 });
@@ -59,7 +54,7 @@ const MenuButton = memo((props) => {
   const [rProps, setRProps] = useState({col: 0, w: 0});
   const isOver = useRef(false);
   const t = useRef(EASE_TIME);
-  useTick(delta => {
+  useEffect(() => {
     let col = 0x444444, w = props.maxW;
     if (props.selected) {
       t.current = EASE_TIME;
@@ -67,15 +62,15 @@ const MenuButton = memo((props) => {
     } else {
       col = 0x888888;
       if (isOver.current) {
-        t.current = Math.min(EASE_TIME, t.current+delta/50);
+        t.current = Math.min(EASE_TIME, t.current + props.delta);
         w = easeOutExpo(t.current / EASE_TIME) * props.maxW;
       } else {
-        t.current = Math.min(EASE_TIME, t.current+delta/50);
+        t.current = Math.min(EASE_TIME, t.current + props.delta);
         w = (1 - easeOutExpo(t.current / EASE_TIME)) * props.maxW;
       }
     }
     setRProps({col: col, w: w});
-  });
+  }, [props]);
   
 
   const pointerOver = () => {
@@ -90,6 +85,7 @@ const MenuButton = memo((props) => {
     t.current = easeInExpo(1 - rProps.w / props.maxW) * EASE_TIME;
   }
   const pointerTap = () => { props.onSelect(); }
+
   return (
     <Container interactive={true} buttonMode={true}
       pointerover={pointerOver}
@@ -105,10 +101,6 @@ const MenuButton = memo((props) => {
       />
     </Container>
   );
-});
-
-const ContainerSelector = memo((props) => {
-  return props.containers[props.selected];
 });
 
 export { Menu };

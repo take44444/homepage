@@ -1,6 +1,6 @@
-import { Container, useTick } from "@inlet/react-pixi";
+import { Container } from "@inlet/react-pixi";
 import { GlowFilter } from "@pixi/filter-glow";
-import { memo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { RRect, UText } from "./util";
 
 const SMOOTHING = 0.7;
@@ -46,7 +46,7 @@ class Audio {
   }
 
   getAudio() {
-    if (this.status !== 2) return [0];
+    if (this.status === 0) return [0];
     this.analyser.smoothingTimeConstant = SMOOTHING;
     this.analyser.fftSize = FFT_SIZE;
     this.analyser.getByteFrequencyData(this.freqs);
@@ -67,6 +67,9 @@ class Audio {
 }
 
 const AudioPlayer = memo((props) => {
+  const filters = useMemo(() => [
+    new GlowFilter({distance: 30, color: 0x555555, outerStrength: 1.5})
+  ], []);
   const [state, setState] = useState(
     {playing: false, text: 'Play', col: 0x0077FF}
   );
@@ -80,10 +83,8 @@ const AudioPlayer = memo((props) => {
     }
   }
   return (
-    <Container interactive={true} buttonMode={true} pointertap={pointerTap}
-      filters={[
-        new GlowFilter({distance: 30, color: 0x555555, outerStrength: 1.5})
-      ]}
+    <Container filters={filters}
+      interactive={true} buttonMode={true} pointertap={pointerTap}
     >
       <RRect col={state.col}
         x={props.x} y={props.y} w={props.h*2.88} h={props.h}
@@ -95,24 +96,23 @@ const AudioPlayer = memo((props) => {
   );
 });
 
-const AudioTimeText = (props) => {
-  const [t, setT] = useState(0);
-  useTick(_ => {
-    setT(props.audio.ctx.currentTime);
-  });
+const AudioTimeText = memo((props) => {
+  const filters = useMemo(() => [
+    new GlowFilter({distance: 40, color: 0x0077FF, outerStrength: 1.5})
+  ], []);
   return (
-    <UText {...props}
+    <UText {...props} filters={filters}
       text={
         `${
-          (('00')+Math.floor(t/60)).slice(-2)
+          (('00')+Math.floor(props.t/60)).slice(-2)
         }:${
-          (('00')+Math.floor(t)%60).slice(-2)
+          (('00')+Math.floor(props.t)%60).slice(-2)
         }:${
-          (('00')+t.toFixed(2)).slice(-2)
+          (('00')+props.t.toFixed(2)).slice(-2)
         }`
       }
     />
   );
-}
+});
 
 export { Audio, AudioPlayer, AudioTimeText };

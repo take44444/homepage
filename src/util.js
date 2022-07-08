@@ -1,20 +1,20 @@
-import { Graphics, PixiComponent, Text } from '@inlet/react-pixi'
-import { TextStyle, Graphics as PGraphics } from 'pixi.js';
-import { useCallback } from 'react';
+import { Graphics, Text } from '@inlet/react-pixi'
+import { TextStyle } from 'pixi.js';
+import { memo, useCallback } from 'react';
 
-const UText = (props) => {
+const UText = memo((props) => {
   return (
     <Text {...props}
-      style={ new TextStyle({
+      style={new TextStyle({
         fontFamily: 'Noto Sans Mono',
         fontSize: props.h,
         fill : props.col
-      }) }
+      })}
     />
   )
-}
+});
 
-const RRect = (props) => {
+const RRect = memo((props) => {
   const draw = useCallback((g) => {
     g.clear();
     g.beginFill(props.col);
@@ -23,9 +23,9 @@ const RRect = (props) => {
   }, [props]);
 
   return <Graphics draw={draw} />;
-};
+});
 
-const Rect = (props) => {
+const Rect = memo((props) => {
   const draw = useCallback((g) => {
     g.clear();
     g.beginFill(props.col);
@@ -34,17 +34,6 @@ const Rect = (props) => {
   }, [props]);
 
   return <Graphics draw={draw} />;
-};
-
-const Circle = PixiComponent('Circle', {
-  create: props => new PGraphics()
-    .beginFill(props.col)
-    .drawCircle(0, 0, props.sz)
-    .endFill(),
-  applyProps: (instance, _, props) => {
-    instance.x = props.x;
-    instance.y = props.y;
-  }
 });
 
-export { UText, Rect, RRect, Circle };
+export { UText, Rect, RRect };

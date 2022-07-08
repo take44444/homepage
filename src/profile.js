@@ -68,4 +68,5 @@ const OTHER = {
   ]
 };
 
-export { SNS, INTERESTS, OTHER };
+const PROFILE = [SNS, INTERESTS, OTHER]
+export default PROFILE;
