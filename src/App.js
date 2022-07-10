@@ -12,7 +12,6 @@ import { GlowFilter } from '@pixi/filter-glow';
 
 const Main = () => {
   const [time, setTime] = useState(0);
-  const [delta, setDelta] = useState(0);
   const [audioData, setAudioData] = useState({t: 0, v: 0});
   const [loaded, setLoaded] = useState(false);
   function onLoad() { setLoaded(true); }
@@ -29,10 +28,9 @@ const Main = () => {
       strength: 107
     })
   ], []);
-  useTick(d => {
+  useTick((_) => {
     if (!loaded) return;
-    setDelta(d/50);
-    setTime(time + d/50);
+    setTime(new Date().getTime() / 1000);
     if (audioData.t !== audio.ctx.currentTime) {
       const data = audio.getAudio().slice(0, 8);
       const vol = data.reduce((a, b)=> a + b, 0) / data.length / 200;
@@ -52,7 +50,7 @@ const Main = () => {
       sz={2.5} divX={120} divY={120} {...audioData} fields={fields}
     />
     <Menu x1={840} y1={200} w={220} h={170} iH={35}
-      x2={1130} y2={52} lH={23} lines={32} dL={PROFILE} delta={delta}
+      x2={1130} y2={52} lH={23} lines={32} dL={PROFILE} t={time}
     />
     <StatusLine x={0} y={820} w={1920} h={20} t={time} />
     </>
@@ -64,6 +62,8 @@ const App = () => {
   const stageProps = {
     width: 1920,
     height: 840,
+    // raf: false,
+    // renderOnComponentChange: true,
     options: {
       autoDensity: true,
       // resolution: resolution || 1,

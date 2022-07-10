@@ -3,14 +3,16 @@ import { Rect, UText } from './util'
 
 const Fps = (props) => {
   const cnt = useRef(0);
-  const last = useRef(0);
+  const t = useRef(0);
   const [fps, setFps] = useState('');
   useEffect(_ => {
     cnt.current += 1;
-    if ((props.t - last.current) > 0.2) {
-      setFps(`fps: ${((cnt.current) / (props.t - last.current)).toFixed(1)}`);
+    if ((props.t - t.current) > 0.2) {
+      setFps(`fps: ${
+        ((cnt.current) / (props.t - t.current)).toFixed(1)
+      }`);
       cnt.current = 0;
-      last.current = props.t;
+      t.current = props.t;
     }
   }, [props.t]);
   return (

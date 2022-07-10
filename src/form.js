@@ -33,7 +33,7 @@ const Form = PixiComponent('Form', {
     let idx = 0;
     for (let i=0; i<=props.divX; i++) {
       for(let j=0; j<=props.divY; j++) {
-        const p = field(i*dx-props.w/2, j*dy-props.h/2);
+        const p = field(i * dx - props.w / 2, j * dy - props.h / 2);
         instance.getChildAt(idx).x = p[0];
         instance.getChildAt(idx++).y = p[1];
       }

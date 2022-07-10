@@ -1,6 +1,6 @@
 import { Container } from "@inlet/react-pixi";
 import { GlowFilter } from "@pixi/filter-glow";
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { JsonContainer } from "./json-text";
 import { RRect, UText } from "./util";
 
@@ -32,7 +32,7 @@ const Menu = memo((props) => {
       <MenuButton key={i} title={props.dL[i].title}
         x={props.x1} y={props.y1+(interval+props.iH)*i}
         maxW={props.w} h={props.iH} selected={selected===i}
-        filters={filters} delta={props.delta}
+        filters={filters} t={props.t}
         onPoint={()=>{setPointed(i)}} onSelect={()=>{setSelected(i)}}
       />
     ))}
@@ -51,40 +51,55 @@ const Menu = memo((props) => {
 });
 
 const MenuButton = memo((props) => {
-  const [rProps, setRProps] = useState({col: 0, w: 0});
-  const isOver = useRef(false);
-  const t = useRef(EASE_TIME);
+  const [w, setW] = useState(0);
+  const [col, setCol] = useState(0x888888);
+  const time = useRef(props.t);
+  const t = useRef(0);
+  const last = useRef(false);
+  const [isOver, setIsOver] = useState(false);
   useEffect(() => {
-    let col = 0x444444, w = props.maxW;
-    if (props.selected) {
-      t.current = EASE_TIME;
-      isOver.current = false;
-    } else {
-      col = 0x888888;
-      if (isOver.current) {
-        t.current = Math.min(EASE_TIME, t.current + props.delta);
-        w = easeOutExpo(t.current / EASE_TIME) * props.maxW;
-      } else {
-        t.current = Math.min(EASE_TIME, t.current + props.delta);
-        w = (1 - easeOutExpo(t.current / EASE_TIME)) * props.maxW;
+    const delta = props.t - time.current;
+    time.current = props.t;
+    if (props.selected) return;
+    t.current += delta;
+    if (isOver) {
+      if (!last.current) {
+        t.current = Math.min(
+          EASE_TIME, easeInExpo(w / props.maxW) * EASE_TIME
+        );
       }
+      setW(easeOutExpo(t.current / EASE_TIME) * props.maxW);
+    } else {
+      if (last.current) {
+        t.current = Math.min(
+          EASE_TIME, easeInExpo(1 - w / props.maxW) * EASE_TIME
+        );
+      }
+      setW((1 - easeOutExpo(t.current / EASE_TIME)) * props.maxW);
     }
-    setRProps({col: col, w: w});
-  }, [props]);
-  
+    last.current = isOver;
+  }, [props.t]);
+  useEffect(() => {
+    if (props.selected) {
+      setW(props.maxW);
+      setCol(0x444444);
+    } else {
+      t.current = EASE_TIME;
+      setW(0);
+      setCol(0x888888);
+    }
+  }, [props.selected, props.maxW]);
 
-  const pointerOver = () => {
+  const pointerOver = useCallback(() => {
     props.onPoint();
-    if (props.selected) return;
-    isOver.current = true;
-    t.current = easeInExpo(rProps.w / props.maxW) * EASE_TIME;
-  }
-  const pointerOut = () => {
-    if (props.selected) return;
-    isOver.current = false;
-    t.current = easeInExpo(1 - rProps.w / props.maxW) * EASE_TIME;
-  }
-  const pointerTap = () => { props.onSelect(); }
+    setIsOver(true);
+  }, []);
+  const pointerOut = useCallback(() => {
+    setIsOver(false);
+  }, []);
+  const pointerTap = useCallback(() => {
+    props.onSelect();
+  }, []);
 
   return (
     <Container interactive={true} buttonMode={true}
@@ -93,7 +108,7 @@ const MenuButton = memo((props) => {
       pointertap={pointerTap}
       filters={props.filters}
     >
-      <RRect {...rProps}
+      <RRect w={w} col={col}
         x={props.x} y={props.y} h={props.h}
       />
       <UText text={props.title} col={0x0A0A0A}
