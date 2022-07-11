@@ -6,6 +6,8 @@ import { FC, useCallback, useMemo, useState } from "react";
 import { Audio, AudioPlayer, AudioTimeText } from "./audio";
 import { FractalField, SphericalField } from "./field";
 import { Form } from "./form";
+import { Menu } from "./menu";
+import PROFILE from "./profile";
 import { StatusLine } from "./statusline";
 import { Rect, UText } from "./util";
 
@@ -48,6 +50,9 @@ const Main: FC = () => {
     />
     <Form x={430} y={450} w={226} h={226} col={0x0A0A0A}
       sz={2.5} divX={120} divY={120} {...audioData} fields={fields}
+    />
+    <Menu x1={840} y1={200} w={220} h={170} iH={35}
+      x2={1130} y2={52} lH={23} lines={32} dL={PROFILE} t={time}
     />
     <StatusLine x={0} y={820} w={1920} h={20} t={time} />
     </>}</>
