@@ -15,7 +15,7 @@ const Main: FC = () => {
   const [audioData, setAudioData] = useState({t: 0, v: 0});
   const [loaded, setLoaded] = useState(false);
   const onLoad = useCallback(() => { setLoaded(true); }, []);
-  const audio = useMemo(() => new Audio('/bgm.mp3', onLoad), []);
+  const audio = useMemo(() => new Audio('/bgm.mp3', onLoad), [onLoad]);
   const titleFilters: Filter[] = useMemo(() => [
     new GlowFilter({distance: 40, color: 0x0A0A0A, outerStrength: 1.5})
   ], []);

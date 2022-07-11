@@ -11,7 +11,7 @@ WebFont.load({
   inactive: () => alert('font loading failed')
 });
 
-function init() {
+const init = () => {
   // const root = ReactDOM.createRoot(document.getElementById('root'));
   const root = document.getElementById('root');
   ReactDOM.render(
