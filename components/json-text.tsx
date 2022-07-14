@@ -10,19 +10,22 @@ type Props = {
   depth?: number,
   posX?: number,
   json: any,
-  alpha?: number,
+  visible?: boolean,
   lines?: number
 };
 
-const jsonContainer = (props: Props): [number, number, ReactElement] => {
-  const jsons = [];
+const jsonContainer = (
+  props: Props,
+  jsons: ReactElement[]
+): [number, number] => {
   const gProps = {
     line: props.line!, depth: props.depth!, posX: props.posX!
   };
   if (props.posX === 0)
-    jsons.push(<LineNumText key={`${gProps.line}/-3`}
-      x={props.x} y={props.y} lH={props.lH} line={gProps.line}
-    />);
+    jsons.push(<TextAt key={`${gProps.line}/-3`}
+    text={`${('  ' + gProps.line).slice(-2)}`} col={0x666666}
+    x={props.x} y={props.y} lH={props.lH} line={gProps.line} posX={-3}
+  />);
   if (props.json instanceof Object) {
     jsons.push(<TextAt key={`${gProps.line}/${gProps.posX}`}
       text={(props.json instanceof Array) ? '[' : '{'} col={0x000000}
@@ -43,8 +46,9 @@ const jsonContainer = (props: Props): [number, number, ReactElement] => {
         );
         gProps.line++;
       }
-      jsons.push(<LineNumText key={`${gProps.line}/-3`}
-        x={props.x} y={props.y} lH={props.lH} line={gProps.line}
+      jsons.push(<TextAt key={`${gProps.line}/-3`}
+        text={`${('  ' + gProps.line).slice(-2)}`} col={0x666666}
+        x={props.x} y={props.y} lH={props.lH} line={gProps.line} posX={-3}
       />);
       gProps.posX = gProps.depth*2;
       if (!(props.json instanceof Array)) {
@@ -65,17 +69,16 @@ const jsonContainer = (props: Props): [number, number, ReactElement] => {
         );
         gProps.posX += 2;
       }
-      let cJson;
-      [gProps.posX, gProps.line, cJson] = jsonContainer(Object.assign({
+      [gProps.posX, gProps.line] = jsonContainer(Object.assign({
         x: props.x, y: props.y, lH: props.lH, json: props.json[key]
-      }, gProps));
-      jsons.push(cJson);
+      }, gProps), jsons);
       f = true;
     }
     gProps.line++;gProps.depth--;
 
-    jsons.push(<LineNumText key={`${gProps.line}/-3`}
-      x={props.x} y={props.y} lH={props.lH} line={gProps.line}
+    jsons.push(<TextAt key={`${gProps.line}/-3`}
+      text={`${('  ' + gProps.line).slice(-2)}`} col={0x666666}
+      x={props.x} y={props.y} lH={props.lH} line={gProps.line} posX={-3}
     />);
     gProps.posX = gProps.depth*2;
     jsons.push(
@@ -85,11 +88,7 @@ const jsonContainer = (props: Props): [number, number, ReactElement] => {
         line={gProps.line} posX={gProps.posX}
       />
     );
-    return [gProps.posX+1, gProps.line,
-      <Container key={`c${gProps.line}/${gProps.posX}`}>
-        {jsons.map((e, _) => e)}
-      </Container>
-    ];
+    return [gProps.posX+1, gProps.line];
   }
   if (props.json.includes('.')) {
     jsons.push(
@@ -110,39 +109,27 @@ const jsonContainer = (props: Props): [number, number, ReactElement] => {
       />
     );
   }
-  return [gProps.posX+props.json.length+2, gProps.line,
-    <Container key={`c${gProps.line}/${gProps.posX}`}>
-      {jsons.map((e, _) => e)}
-    </Container>
-  ];
+  return [gProps.posX+props.json.length+2, gProps.line];
 }
 
 const JsonContainer = memo(function JsonContainer_(props: Props) {
-  const jC = useMemo(() => {
-    return jsonContainer(Object.assign({posX: 0, line: 1, depth: 0}, props));
+  const jC: [number, ReactElement[]] = useMemo(() => {
+    const jsons: ReactElement[] = [];
+    const [_, line] = jsonContainer(
+      Object.assign({posX: 0, line: 1, depth: 0}, props), jsons
+    );
+    return [line, jsons];
   }, []);
   return (
-    <Container alpha={props.alpha}>
-      {jC[2]}
-      {[...Array(props.lines!-jC[1])].map((_, i) => (
-        <LineNumText key={`${jC[1]+1+i}/-3`}
-          x={props.x} y={props.y} lH={props.lH} line={jC[1]+1+i}
+    <Container visible={props.visible}>
+      {jC[1]}
+      {[...Array(props.lines!-jC[0])].map((_, i) => (
+        <TextAt key={`${jC[0]+1+i}/-3`}
+          text={`${('  ' + (jC[0]+1+i)).slice(-2)}`} col={0x666666}
+          x={props.x} y={props.y} lH={props.lH} line={jC[0]+1+i} posX={-3}
         />
       ))}
     </Container>
-  )
-});
-
-const LineNumText = memo(function LineNumText_(props: {
-  x: number,
-  y: number,
-  line: number,
-  lH: number
-}) {
-  return (
-    <TextAt text={`${('  ' + props.line).slice(-2)}`} col={0x666666}
-      x={props.x} y={props.y} lH={props.lH} line={props.line} posX={-3}
-    /> 
   )
 });
 
@@ -170,4 +157,4 @@ const TextAt = memo(function TextAt_(props: {
   )
 });
 
-export { JsonContainer, LineNumText };
+export { JsonContainer };
