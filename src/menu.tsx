@@ -63,7 +63,7 @@ const Menu = memo((props: {
     />
     {props.dL.map((d: any, i: number) => (
       <JsonContainer key={i} x={props.x2} y={props.y2} lH={props.lH}
-        json={d} lines={props.lines} alpha={selected === i ? 1 : 0}
+        json={d} lines={props.lines} visible={selected === i}
       />
     ))}
     </>

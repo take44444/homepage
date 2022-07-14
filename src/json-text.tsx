@@ -10,7 +10,7 @@ type Props = {
   depth?: number,
   posX?: number,
   json: any,
-  alpha?: number,
+  visible?: boolean,
   lines?: number
 };
 
@@ -122,7 +122,7 @@ const JsonContainer = memo((props: Props) => {
     return jsonContainer(Object.assign({posX: 0, line: 1, depth: 0}, props));
   }, []);
   return (
-    <Container alpha={props.alpha}>
+    <Container visible={props.visible}>
       {jC[2]}
       {[...Array(props.lines!-jC[1])].map((_, i) => (
         <LineNumText key={`${jC[1]+1+i}/-3`}
